@@ -1,0 +1,35 @@
+[
+  {
+    "no": 1,
+    "wok": "SMG-1",
+    "tipeDesain": "PT3BR",
+    "namaProyek": "PT3BR-25-WLR-FA-KENDAL_22024_H2_2025",
+    "keteranganDrop": "Warga tidak mengizinkan penambahan tiang",
+    "ihldLopId": "12325183",
+    "jmlOdp": 4,
+    "jmlPort": 32,
+    "totalBoq": "20,603,316"
+  },
+  {
+    "no": 2,
+    "wok": "SMG-2",
+    "tipeDesain": "PT3BR",
+    "namaProyek": "PT3BR-25-SMC-FC-SMG2_SMC_SEKARANGNPATI",
+    "keteranganDrop": "Hasil review DBAD = DROP, OVER CPP",
+    "ihldLopId": "11387359",
+    "jmlOdp": 3,
+    "jmlPort": 24,
+    "totalBoq": "27,533,951"
+  },
+  {
+    "no": 3,
+    "wok": "PATI",
+    "tipeDesain": "PT3",
+    "namaProyek": "MD-PT3-PAT-FG-APC PERUM KUSUMA",
+    "keteranganDrop": "Tidak diizinkan warga untuk tanam tiang",
+    "ihldLopId": "12423360",
+    "jmlOdp": 4,
+    "jmlPort": 32,
+    "totalBoq": "43,730,526"
+  }
+]
