@@ -7,7 +7,7 @@ dotenv.config();
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SHEET_RANGE = process.env.SHEET_RANGE || "Sheet1!A1:I1000";
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 menit
+const CACHE_TTL_MS = 5 * 60 * 1000; 
 const USE_SAMPLE_DATA = process.env.USE_SAMPLE_DATA === "true";
 const SAMPLE_DATA_PATH = process.env.SAMPLE_DATA_PATH || "sample-data/projects.json";
 
@@ -69,10 +69,7 @@ async function fetchRowsFromSheet() {
     });
 }
 
-/**
- * Ambil daftar proyek, pakai cache in-memory supaya tidak boros quota
- * Google Sheets API. Panggil dengan forceRefresh=true untuk skip cache.
- */
+
 export async function getProjects(forceRefresh = false) {
   const isExpired = Date.now() - cache.fetchedAt > CACHE_TTL_MS;
   if (forceRefresh || isExpired || cache.rows.length === 0) {
@@ -82,10 +79,6 @@ export async function getProjects(forceRefresh = false) {
   return cache.rows;
 }
 
-/**
- * Cari beberapa baris berdasarkan ID unik (default pakai kolom ihldLopId).
- * Ganti idField kalau kolom unik di spreadsheet Anda namanya beda.
- */
 export async function getRowsByIds(ids, idField = "ihldLopId") {
   const projects = await getProjects();
   const idSet = new Set(ids.map(String));

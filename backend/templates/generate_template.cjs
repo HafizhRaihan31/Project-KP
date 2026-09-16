@@ -1,11 +1,3 @@
-/**
- * Script bantuan untuk membuat ulang template contoh (ba-drop-template.docx).
- * Tidak dipanggil saat runtime — cukup dijalankan sekali kalau template
- * contoh ini mau di-regenerate. Untuk mengubah tampilan dokumen sehari-hari,
- * cukup edit file ba-drop-template.docx langsung di Word/LibreOffice.
- *
- * Jalankan: node templates/generate_template.cjs
- */
 const fs = require("fs");
 const {
   Document,
