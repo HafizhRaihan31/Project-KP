@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchProjects, generateDocument, refreshProjects } from "./api.js";
+import { fetchProjects, generateDocument, getSession, login, logout, refreshProjects } from "./api.js";
 import ExportActionBar from "./components/ExportActionBar.jsx";
+import LoginScreen from "./components/LoginScreen.jsx";
 import PageHeader from "./components/PageHeader.jsx";
 import ProjectFilters from "./components/ProjectFilters.jsx";
 import ProjectTable from "./components/ProjectTable.jsx";
@@ -10,6 +11,7 @@ import StatusAlerts from "./components/StatusAlerts.jsx";
 import { parseAmount, sortProjects } from "./utils/projects.js";
 
 export default function App() {
+  const [authState, setAuthState] = useState("checking");
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [wokFilter, setWokFilter] = useState("all");
@@ -66,6 +68,15 @@ export default function App() {
     });
   }
 
+  function handleApiError(error) {
+    if (error.status === 401) {
+      setAuthState("unauthenticated");
+      setProjects([]);
+      setSelectedIds(new Set());
+    }
+    setErrorMsg(error.message);
+  }
+
   async function loadProjects(searchTerm = "") {
     setLoading(true);
     setErrorMsg("");
@@ -75,13 +86,33 @@ export default function App() {
       setProjects(data);
       pruneSelection(data);
     } catch (error) {
-      setErrorMsg(error.message);
+      handleApiError(error);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { loadProjects(); }, []);
+  useEffect(() => {
+    getSession()
+      .then(({ authenticated }) => {
+        setAuthState(authenticated ? "authenticated" : "unauthenticated");
+        if (authenticated) loadProjects();
+      })
+      .catch(() => setAuthState("unauthenticated"));
+  }, []);
+
+  async function handleLogin(password) {
+    await login(password);
+    setAuthState("authenticated");
+    await loadProjects();
+  }
+
+  async function handleLogout() {
+    await logout();
+    setAuthState("unauthenticated");
+    setProjects([]);
+    setSelectedIds(new Set());
+  }
 
   function toggleSelect(id) {
     setSelectedIds((previous) => {
@@ -118,9 +149,9 @@ export default function App() {
       const { data, total } = await refreshProjects();
       setProjects(data);
       pruneSelection(data);
-      setSyncMsg(`Sinkron selesai. ${total} data terbaru dimuat dari Google Sheet.`);
+      setSyncMsg(`Data berhasil diperbarui. ${total} proyek terbaru dimuat dari Google Sheets.`);
     } catch (error) {
-      setErrorMsg(error.message);
+      handleApiError(error);
     } finally {
       setLoading(false);
     }
@@ -135,7 +166,7 @@ export default function App() {
 
   async function handleGenerate(format) {
     if (selectedIds.size === 0) {
-      setErrorMsg("Pilih minimal satu proyek dulu.");
+      setErrorMsg("Pilih setidaknya satu proyek sebelum membuat dokumen.");
       return;
     }
     setGenerating(true);
@@ -143,7 +174,7 @@ export default function App() {
     try {
       await generateDocument([...selectedIds], format, exportFilename || defaultFilename(), reportDetails);
     } catch (error) {
-      setErrorMsg(error.message);
+      handleApiError(error);
     } finally {
       setGenerating(false);
     }
@@ -157,16 +188,24 @@ export default function App() {
     loadProjects();
   }
 
+  if (authState === "checking") {
+    return <main className="login-page"><p className="auth-loading">Memeriksa sesi...</p></main>;
+  }
+
+  if (authState === "unauthenticated") {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   const allVisibleSelected = visibleProjects.length > 0
     && visibleProjects.every((project) => selectedIds.has(project.ihldLopId));
 
   return <main className="app-shell">
-    <PageHeader loading={loading} onRefresh={handleRefresh} />
+    <PageHeader loading={loading} onRefresh={handleRefresh} onLogout={handleLogout} />
     <StatsGrid totalData={projects.length} visibleData={visibleProjects.length}
       selectedData={selectedIds.size} totalBoq={totalBoq} />
     <ProjectFilters search={search} wokFilter={wokFilter} wokOptions={wokOptions} loading={loading}
       onSearchChange={setSearch} onWokChange={setWokFilter} onReset={resetFilters} />
-    <StatusAlerts errorMessage={errorMsg} successMessage={syncMsg} />
+    {(errorMsg || syncMsg) && <StatusAlerts errorMessage={errorMsg} successMessage={syncMsg} />}
     <ReportDetailsForm values={reportDetails} onChange={setReportDetails} />
     <ProjectTable projects={visibleProjects} selectedIds={selectedIds} sortKey={sortKey} sortDir={sortDir}
       allVisibleSelected={allVisibleSelected} onSort={handleSort} onToggle={toggleSelect}

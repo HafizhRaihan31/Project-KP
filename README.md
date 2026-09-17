@@ -127,6 +127,19 @@ cd ../frontend && npm install
 
 ## Menjalankan project
 
+### Konfigurasi login
+
+Backend melindungi data proyek dan proses generate dengan satu password aplikasi.
+Tambahkan nilai berikut ke `backend/.env`:
+
+```env
+APP_PASSWORD=password_yang_kuat_dan_unik
+SESSION_SECRET=string_acak_minimal_32_karakter
+```
+
+Session disimpan dalam cookie `HttpOnly` dan berlaku selama 5 jam. Buat secret
+acak di Linux dengan `openssl rand -hex 32`. Jangan commit file `.env` ke Git.
+
 ```bash
 # terminal 1
 cd backend

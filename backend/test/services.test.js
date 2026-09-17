@@ -5,9 +5,12 @@ import os from "node:os";
 import path from "node:path";
 
 process.env.USE_SAMPLE_DATA = "true";
+process.env.APP_PASSWORD = "test-password";
+process.env.SESSION_SECRET = "test-session-secret-minimal-32-karakter";
 
 const { getProjects, getRowsByIds } = await import("../src/services/sheetsService.js");
 const { buildTemplateData, formatReportDate, renderDocx } = await import("../src/services/docService.js");
+const { createSessionToken, verifySessionToken } = await import("../src/auth.js");
 
 test("membaca dan mencari data contoh lokal", async () => {
   const projects = await getProjects(true);
@@ -53,4 +56,12 @@ test("mengisi detail berita acara dan mengeja tanggal", async () => {
   assert.equal(data.nomorSp, "SP-002");
   assert.equal(data.tanggalBeritaAcara, "Rabu Tanggal Tiga Bulan Juni Tahun Dua Ribu Dua Puluh Enam");
   assert.equal(formatReportDate("2026-06-03"), data.tanggalBeritaAcara);
+});
+
+test("session berlaku selama lima jam dan menolak token kedaluwarsa", () => {
+  const now = Date.parse("2026-09-17T00:00:00Z");
+  const token = createSessionToken(now);
+  assert.equal(verifySessionToken(token, now + (5 * 60 * 60 * 1000) - 1), true);
+  assert.equal(verifySessionToken(token, now + (5 * 60 * 60 * 1000)), false);
+  assert.equal(verifySessionToken(`${token}rusak`, now), false);
 });
