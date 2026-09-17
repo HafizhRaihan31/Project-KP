@@ -7,7 +7,7 @@ import path from "node:path";
 process.env.USE_SAMPLE_DATA = "true";
 
 const { getProjects, getRowsByIds } = await import("../src/services/sheetsService.js");
-const { buildTemplateData, renderDocx } = await import("../src/services/docService.js");
+const { buildTemplateData, formatReportDate, renderDocx } = await import("../src/services/docService.js");
 
 test("membaca dan mencari data contoh lokal", async () => {
   const projects = await getProjects(true);
@@ -35,4 +35,22 @@ test("menghitung total dan menghasilkan DOCX", async () => {
   fs.writeFileSync(tempFile, output);
   assert.ok(fs.statSync(tempFile).size > 0);
   fs.unlinkSync(tempFile);
+});
+
+test("mengisi detail berita acara dan mengeja tanggal", async () => {
+  const projects = await getProjects(true);
+  const data = buildTemplateData(projects.slice(0, 1), {
+    projectTitle: "JPP 2026 TIF Batch 1 Semarang",
+    contractNumber: "PKS-001",
+    spNumber: "SP-002",
+    executor: "PT. TELKOM AKSES",
+    district: "Semarang",
+    reportDate: "2026-06-03",
+  });
+
+  assert.equal(data.judulProyek, "JPP 2026 TIF Batch 1 Semarang");
+  assert.equal(data.nomorKontrak, "PKS-001");
+  assert.equal(data.nomorSp, "SP-002");
+  assert.equal(data.tanggalBeritaAcara, "Rabu Tanggal Tiga Bulan Juni Tahun Dua Ribu Dua Puluh Enam");
+  assert.equal(formatReportDate("2026-06-03"), data.tanggalBeritaAcara);
 });

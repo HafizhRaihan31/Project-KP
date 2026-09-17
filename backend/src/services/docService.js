@@ -18,11 +18,38 @@ function formatNumber(value) {
   return value.toLocaleString("id-ID");
 }
 
+function cleanText(value, fallback = "", maxLength = 250) {
+  const text = String(value || "").replace(/[\u0000-\u001F\u007F]/g, " ").trim();
+  return (text || fallback).slice(0, maxLength);
+}
+
+function numberToWords(value) {
+  const units = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+  const number = Math.floor(Number(value));
+  if (number < 12) return units[number];
+  if (number < 20) return `${numberToWords(number - 10)} Belas`;
+  if (number < 100) return `${numberToWords(Math.floor(number / 10))} Puluh ${numberToWords(number % 10)}`.trim();
+  if (number < 200) return `Seratus ${numberToWords(number - 100)}`.trim();
+  if (number < 1000) return `${numberToWords(Math.floor(number / 100))} Ratus ${numberToWords(number % 100)}`.trim();
+  if (number < 2000) return `Seribu ${numberToWords(number - 1000)}`.trim();
+  if (number < 1000000) return `${numberToWords(Math.floor(number / 1000))} Ribu ${numberToWords(number % 1000)}`.trim();
+  return String(number);
+}
+
+export function formatReportDate(value) {
+  const parsed = /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))
+    ? new Date(`${value}T00:00:00Z`)
+    : new Date();
+  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  return `${days[parsed.getUTCDay()]} Tanggal ${numberToWords(parsed.getUTCDate())} Bulan ${months[parsed.getUTCMonth()]} Tahun ${numberToWords(parsed.getUTCFullYear())}`;
+}
+
 /**
  * Susun data yang dibutuhkan template dari daftar baris proyek terpilih.
  * `items` dipakai untuk loop tabel, sisanya untuk placeholder biasa.
  */
-export function buildTemplateData(rows) {
+export function buildTemplateData(rows, reportDetails = {}) {
   const items = rows.map((row, index) => ({
     no: index + 1,
     wok: row.wok || "",
@@ -40,6 +67,7 @@ export function buildTemplateData(rows) {
   const totalBoq = rows.reduce((sum, r) => sum + parseNumber(r.totalBoq), 0);
 
   const today = new Date();
+  const fallbackTitle = [...new Set(rows.map((row) => row.namaProyek).filter(Boolean))].join(", ");
 
   return {
     items,
@@ -52,6 +80,12 @@ export function buildTemplateData(rows) {
       month: "long",
       year: "numeric",
     }),
+    judulProyek: cleanText(reportDetails.projectTitle, fallbackTitle),
+    nomorKontrak: cleanText(reportDetails.contractNumber, "-", 100),
+    nomorSp: cleanText(reportDetails.spNumber, "-", 100),
+    pelaksana: cleanText(reportDetails.executor, "PT. TELKOM AKSES", 150),
+    district: cleanText(reportDetails.district, "Semarang", 100),
+    tanggalBeritaAcara: formatReportDate(reportDetails.reportDate),
   };
 }
 

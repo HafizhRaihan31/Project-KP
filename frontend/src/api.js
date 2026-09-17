@@ -13,11 +13,11 @@ export async function refreshProjects(search = "") {
 /**
  * Minta backend generate dokumen, lalu trigger download di browser.
  */
-export async function generateDocument(ids, format, filename = "") {
+export async function generateDocument(ids, format, filename = "", reportDetails = {}) {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids, format, filename }),
+    body: JSON.stringify({ ids, format, filename, reportDetails }),
   });
 
   if (!res.ok) {

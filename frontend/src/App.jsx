@@ -4,6 +4,7 @@ import ExportActionBar from "./components/ExportActionBar.jsx";
 import PageHeader from "./components/PageHeader.jsx";
 import ProjectFilters from "./components/ProjectFilters.jsx";
 import ProjectTable from "./components/ProjectTable.jsx";
+import ReportDetailsForm from "./components/ReportDetailsForm.jsx";
 import StatsGrid from "./components/StatsGrid.jsx";
 import StatusAlerts from "./components/StatusAlerts.jsx";
 import { parseAmount, sortProjects } from "./utils/projects.js";
@@ -20,6 +21,14 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState("");
   const [syncMsg, setSyncMsg] = useState("");
   const [exportFilename, setExportFilename] = useState("");
+  const [reportDetails, setReportDetails] = useState({
+    projectTitle: "",
+    contractNumber: "",
+    spNumber: "",
+    executor: "PT. TELKOM AKSES",
+    district: "Semarang",
+    reportDate: new Date().toISOString().slice(0, 10),
+  });
 
   const visibleProjects = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -132,7 +141,7 @@ export default function App() {
     setGenerating(true);
     setErrorMsg("");
     try {
-      await generateDocument([...selectedIds], format, exportFilename || defaultFilename());
+      await generateDocument([...selectedIds], format, exportFilename || defaultFilename(), reportDetails);
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
@@ -158,6 +167,7 @@ export default function App() {
     <ProjectFilters search={search} wokFilter={wokFilter} wokOptions={wokOptions} loading={loading}
       onSearchChange={setSearch} onWokChange={setWokFilter} onReset={resetFilters} />
     <StatusAlerts errorMessage={errorMsg} successMessage={syncMsg} />
+    <ReportDetailsForm values={reportDetails} onChange={setReportDetails} />
     <ProjectTable projects={visibleProjects} selectedIds={selectedIds} sortKey={sortKey} sortDir={sortDir}
       allVisibleSelected={allVisibleSelected} onSort={handleSort} onToggle={toggleSelect}
       onToggleAll={toggleSelectAllVisible} />

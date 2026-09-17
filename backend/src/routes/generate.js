@@ -17,10 +17,10 @@ function sanitizeFilename(value) {
     .slice(0, 120);
 }
 
-// POST /api/generate  body: { ids: string[], format: "docx" | "pdf", filename?: string }
+// POST /api/generate  body: { ids, format, filename?, reportDetails? }
 router.post("/", async (req, res) => {
   try {
-    const { ids, format = "docx", filename = "" } = req.body;
+    const { ids, format = "docx", filename = "", reportDetails = {} } = req.body;
 
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ error: "ids wajib diisi (array, minimal 1)" });
@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Tidak ada proyek yang cocok dengan ids tersebut" });
     }
 
-    const templateData = buildTemplateData(rows);
+    const templateData = buildTemplateData(rows, reportDetails);
     const docxBuffer = renderDocx(TEMPLATE_PATH, templateData);
 
     const fileDate = new Date().toISOString().slice(0, 10);
