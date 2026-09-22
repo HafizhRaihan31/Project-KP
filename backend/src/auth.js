@@ -10,6 +10,10 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
 const loginAttempts = new Map();
 
+function isAuthDisabled() {
+  return process.env.AUTH_DISABLED === "true";
+}
+
 function getConfig() {
   const password = process.env.APP_PASSWORD || "";
   const secret = process.env.SESSION_SECRET || "";
@@ -20,7 +24,7 @@ function getConfig() {
 }
 
 export function validateAuthConfig() {
-  getConfig();
+  if (!isAuthDisabled()) getConfig();
 }
 
 function safeEqual(left, right) {
@@ -95,6 +99,8 @@ function recordFailure(key, now = Date.now()) {
 }
 
 export function requireAuth(req, res, next) {
+  if (isAuthDisabled()) return next();
+
   if (!verifySessionToken(readCookie(req, COOKIE_NAME))) {
     return res.status(401).json({ error: "Sesi tidak valid atau sudah berakhir" });
   }
@@ -104,7 +110,9 @@ export function requireAuth(req, res, next) {
 export const authRouter = Router();
 
 authRouter.get("/session", (req, res) => {
-  res.json({ authenticated: verifySessionToken(readCookie(req, COOKIE_NAME)) });
+  res.json({
+    authenticated: isAuthDisabled() || verifySessionToken(readCookie(req, COOKIE_NAME)),
+  });
 });
 
 authRouter.post("/login", (req, res) => {

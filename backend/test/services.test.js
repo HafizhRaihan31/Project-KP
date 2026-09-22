@@ -10,7 +10,7 @@ process.env.SESSION_SECRET = "test-session-secret-minimal-32-karakter";
 
 const { getProjects, getRowsByIds } = await import("../src/services/sheetsService.js");
 const { buildTemplateData, formatReportDate, renderDocx } = await import("../src/services/docService.js");
-const { createSessionToken, verifySessionToken } = await import("../src/auth.js");
+const { createSessionToken, requireAuth, validateAuthConfig, verifySessionToken } = await import("../src/auth.js");
 
 test("membaca dan mencari data contoh lokal", async () => {
   const projects = await getProjects(true);
@@ -69,4 +69,19 @@ test("session berlaku selama lima jam dan menolak token kedaluwarsa", () => {
   assert.equal(verifySessionToken(token, now + (5 * 60 * 60 * 1000) - 1), true);
   assert.equal(verifySessionToken(token, now + (5 * 60 * 60 * 1000)), false);
   assert.equal(verifySessionToken(`${token}rusak`, now), false);
+});
+
+test("autentikasi dapat dinonaktifkan sementara melalui environment", () => {
+  const previousValue = process.env.AUTH_DISABLED;
+  process.env.AUTH_DISABLED = "true";
+
+  try {
+    let allowed = false;
+    validateAuthConfig();
+    requireAuth({ headers: {} }, {}, () => { allowed = true; });
+    assert.equal(allowed, true);
+  } finally {
+    if (previousValue === undefined) delete process.env.AUTH_DISABLED;
+    else process.env.AUTH_DISABLED = previousValue;
+  }
 });
