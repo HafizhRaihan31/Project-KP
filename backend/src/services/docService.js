@@ -68,9 +68,28 @@ export function buildTemplateData(rows, reportDetails = {}) {
 
   const today = new Date();
   const fallbackTitle = [...new Set(rows.map((row) => row.namaProyek).filter(Boolean))].join(", ");
+  const reportDate = /^\d{4}-\d{2}-\d{2}$/.test(String(reportDetails.reportDate || ""))
+    ? new Date(`${reportDetails.reportDate}T00:00:00Z`)
+    : today;
+  const documentDate = reportDate.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const evidenceRows = [];
+  for (let index = 0; index < items.length; index += 2) {
+    const left = items[index];
+    const right = items[index + 1];
+    evidenceRows.push({
+      leftCaption: `${left.namaProyek} (${left.keteranganDrop})`,
+      rightCaption: right ? `${right.namaProyek} (${right.keteranganDrop})` : "",
+    });
+  }
 
   return {
     items,
+    evidenceRows,
     jumlahLop: rows.length,
     totalOdp: formatNumber(totalOdp),
     totalPort: formatNumber(totalPort),
@@ -86,6 +105,17 @@ export function buildTemplateData(rows, reportDetails = {}) {
     pelaksana: cleanText(reportDetails.executor, "PT. TELKOM AKSES", 150),
     district: cleanText(reportDetails.district, "Semarang", 100),
     tanggalBeritaAcara: formatReportDate(reportDetails.reportDate),
+    tanggalDokumen: `${cleanText(reportDetails.district, "Semarang", 100)}, ${documentDate}`,
+    signer1Name: cleanText(reportDetails.signer1Name, "ANDRI UTAMA", 100),
+    signer1Nik: cleanText(reportDetails.signer1Nik, "NIK. 92561", 100),
+    signer2Name: cleanText(reportDetails.signer2Name, "REZA RENALDY", 100),
+    signer2Nik: cleanText(reportDetails.signer2Nik, "NIK. 940352", 100),
+    signer3Name: cleanText(reportDetails.signer3Name, "AMRAN QURAISI", 100),
+    signer3Nik: cleanText(reportDetails.signer3Nik, "NIK. 800023", 100),
+    signer4Name: cleanText(reportDetails.signer4Name, "HARTOYO", 100),
+    signer4Nik: cleanText(reportDetails.signer4Nik, "NIK. 790007", 100),
+    signer5Name: cleanText(reportDetails.signer5Name, "HARI HANDOKO", 100),
+    signer5Nik: cleanText(reportDetails.signer5Nik, "NIK. 78013", 100),
   };
 }
 

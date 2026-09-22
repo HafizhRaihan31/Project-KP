@@ -7,6 +7,14 @@ export default function ProjectTable(props) {
       <div><h2>Daftar Proyek</h2><p>Urutkan kolom dan centang data yang ingin dimasukkan ke laporan.</p></div>
       <span className="sort-chip">Urut: {SORT_LABELS[sortKey]} {sortDir === "asc" ? "naik" : "turun"}</span>
     </div>
+    <div className="mobile-selection-bar">
+      <label>
+        <input type="checkbox" checked={allVisibleSelected} onChange={onToggleAll}
+          aria-label="Pilih semua proyek yang ditampilkan" />
+        <span>{allVisibleSelected ? "Batalkan semua" : "Pilih semua hasil"}</span>
+      </label>
+      <strong>{selectedIds.size} dipilih</strong>
+    </div>
     <div className="table-wrap"><table>
       <thead><tr>
         <th className="check-cell"><input type="checkbox" checked={allVisibleSelected} onChange={onToggleAll}
@@ -20,12 +28,15 @@ export default function ProjectTable(props) {
       </tr></thead>
       <tbody>{projects.map((project) => <tr key={project.ihldLopId}
         className={selectedIds.has(project.ihldLopId) ? "selected-row" : ""}>
-        <td className="check-cell"><input type="checkbox" checked={selectedIds.has(project.ihldLopId)}
-          onChange={() => onToggle(project.ihldLopId)} aria-label={`Pilih proyek ${project.namaProyek}`} /></td>
-        <td>{project.no}</td><td className="mono">{project.ihldLopId}</td>
-        <td><span className="wok-pill">{project.wok}</span></td>
-        <td className="project-name">{project.namaProyek}</td><td className="amount">{project.totalBoq}</td>
-        <td className="reason">{project.keteranganDrop}</td>
+        <td className="check-cell"><label className="row-check-label">
+          <input type="checkbox" checked={selectedIds.has(project.ihldLopId)}
+            onChange={() => onToggle(project.ihldLopId)} aria-label={`Pilih proyek ${project.namaProyek}`} />
+        </label></td>
+        <td data-label="No.">{project.no}</td><td className="mono" data-label="IHLD Lop ID">{project.ihldLopId}</td>
+        <td data-label="WOK"><span className="wok-pill">{project.wok}</span></td>
+        <td className="project-name" data-label="Nama proyek">{project.namaProyek}</td>
+        <td className="amount" data-label="Total BOQ">{project.totalBoq}</td>
+        <td className="reason" data-label="Keterangan drop">{project.keteranganDrop}</td>
       </tr>)}</tbody>
     </table></div>
     {projects.length === 0 && <div className="empty-state"><strong>Data tidak ditemukan</strong>

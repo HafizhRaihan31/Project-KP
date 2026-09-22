@@ -29,6 +29,10 @@ test("menghitung total dan menghasilkan DOCX", async () => {
   assert.equal(data.totalOdp, "7");
   assert.equal(data.totalPort, "56");
   assert.equal(data.totalBoq, "48.137.267");
+  assert.deepEqual(data.evidenceRows, [{
+    leftCaption: "PT3BR-25-WLR-FA-KENDAL_22024_H2_2025 (Warga tidak mengizinkan penambahan tiang)",
+    rightCaption: "PT3BR-25-SMC-FC-SMG2_SMC_SEKARANGNPATI (Hasil review DBAD = DROP, OVER CPP)",
+  }]);
 
   const output = renderDocx("templates/ba-drop-template.docx", data);
   assert.ok(Buffer.isBuffer(output));
@@ -56,6 +60,7 @@ test("mengisi detail berita acara dan mengeja tanggal", async () => {
   assert.equal(data.nomorSp, "SP-002");
   assert.equal(data.tanggalBeritaAcara, "Rabu Tanggal Tiga Bulan Juni Tahun Dua Ribu Dua Puluh Enam");
   assert.equal(formatReportDate("2026-06-03"), data.tanggalBeritaAcara);
+  assert.equal(data.tanggalDokumen, "Semarang, 3 Juni 2026");
 });
 
 test("session berlaku selama lima jam dan menolak token kedaluwarsa", () => {
