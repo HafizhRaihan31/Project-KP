@@ -1,7 +1,12 @@
 export const SORT_LABELS = {
+  tanggalInput: "Tanggal input",
   no: "No",
-  ihldLopId: "IHLD Lop ID",
   wok: "WOK",
+  tipeDesain: "Tipe Desain",
   namaProyek: "Nama proyek",
+  keteranganDrop: "Keterangan Drop",
+  ihldLopId: "IHLD Lop ID",
+  jmlOdp: "Jml ODP",
+  jmlPort: "Jml Port",
   totalBoq: "Total BOQ",
 };

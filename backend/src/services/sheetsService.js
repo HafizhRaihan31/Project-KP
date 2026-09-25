@@ -6,7 +6,7 @@ import { getSheetsClient } from "../config/googleAuth.js";
 dotenv.config();
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
-const SHEET_RANGE = process.env.SHEET_RANGE || "Sheet1!A1:I1000";
+const SHEET_RANGE = process.env.SHEET_RANGE || "Sheet1!A1:J1000";
 const CACHE_TTL_MS = 5 * 60 * 1000; 
 const USE_SAMPLE_DATA = process.env.USE_SAMPLE_DATA === "true";
 const SAMPLE_DATA_PATH = process.env.SAMPLE_DATA_PATH || "sample-data/projects.json";
@@ -37,8 +37,8 @@ function toCamelCase(header) {
  * hasilnya array of object dengan key camelCase.
  *
  * Sesuaikan SHEET_RANGE di .env kalau susunan kolom di spreadsheet asli
- * berbeda dari contoh (NO, WOK, Tipe Desain, Nama Proyek, Keterangan Drop,
- * IHLD Lop ID, Jml ODP, Jml Port, Total BOQ).
+ * berbeda dari contoh (NO, Tanggal Input, WOK, Tipe Desain, Nama Proyek,
+ * Keterangan Drop, IHLD Lop ID, Jml ODP, Jml Port, Total BOQ).
  */
 async function fetchRowsFromSheet() {
   if (USE_SAMPLE_DATA) {

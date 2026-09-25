@@ -1,7 +1,9 @@
 import { SORT_LABELS } from "../constants/projectTable.js";
+import { formatInputDate } from "../utils/projects.js";
 
 export default function ProjectTable(props) {
-  const { projects, selectedIds, sortKey, sortDir, allVisibleSelected, onSort, onToggle, onToggleAll } = props;
+  const { projects, selectedIds, sortKey, sortDir, allVisibleSelected,
+    onSort, onToggle, onToggleAll, dateFilter } = props;
   return <section className="table-panel">
     <div className="table-header">
       <div><h2>Daftar Proyek</h2><p>Urutkan kolom dan centang data yang ingin dimasukkan ke laporan.</p></div>
@@ -24,7 +26,6 @@ export default function ProjectTable(props) {
             <span>{sortKey === key ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
           </button>
         </th>)}
-        <th>Keterangan Drop</th>
       </tr></thead>
       <tbody>{projects.map((project) => <tr key={project.ihldLopId}
         className={selectedIds.has(project.ihldLopId) ? "selected-row" : ""}>
@@ -32,14 +33,25 @@ export default function ProjectTable(props) {
           <input type="checkbox" checked={selectedIds.has(project.ihldLopId)}
             onChange={() => onToggle(project.ihldLopId)} aria-label={`Pilih proyek ${project.namaProyek}`} />
         </label></td>
-        <td data-label="No.">{project.no}</td><td className="mono" data-label="IHLD Lop ID">{project.ihldLopId}</td>
+        <td className="input-date" data-label="Tanggal input">{formatInputDate(project.tanggalInput)}</td>
+        <td data-label="No.">{project.no}</td>
         <td data-label="WOK"><span className="wok-pill">{project.wok}</span></td>
+        <td data-label="Tipe Desain">{project.tipeDesain}</td>
         <td className="project-name" data-label="Nama proyek">{project.namaProyek}</td>
-        <td className="amount" data-label="Total BOQ">{project.totalBoq}</td>
         <td className="reason" data-label="Keterangan drop">{project.keteranganDrop}</td>
+        <td className="mono" data-label="IHLD Lop ID">{project.ihldLopId}</td>
+        <td data-label="Jml ODP">{project.jmlOdp}</td>
+        <td data-label="Jml Port">{project.jmlPort}</td>
+        <td className="amount" data-label="Total BOQ">{project.totalBoq}</td>
       </tr>)}</tbody>
     </table></div>
-    {projects.length === 0 && <div className="empty-state"><strong>Data tidak ditemukan</strong>
-      <span>Coba ubah kata kunci pencarian atau filter WOK.</span></div>}
+    {projects.length === 0 && <div className="empty-state">
+      <strong>{dateFilter
+        ? `Tidak ada data pada tanggal ${formatInputDate(dateFilter)}`
+        : "Data tidak ditemukan"}</strong>
+      <span>{dateFilter
+        ? "Tidak ada data proyek masuk tanggal tersebut."
+        : "Coba ubah kata kunci pencarian atau filter WOK."}</span>
+    </div>}
   </section>;
 }

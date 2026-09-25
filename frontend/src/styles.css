@@ -227,7 +227,7 @@ h2 {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 210px auto;
+  grid-template-columns: minmax(240px, 1fr) 190px 180px auto;
   gap: 12px;
   align-items: end;
   border: 1px solid #d9e2ec;
@@ -238,7 +238,8 @@ h2 {
 }
 
 .search-box,
-.select-box {
+.select-box,
+.date-box {
   display: grid;
   gap: 6px;
 }
@@ -382,7 +383,7 @@ select:focus {
 
 table {
   width: 100%;
-  min-width: 1050px;
+  min-width: 1380px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
@@ -395,7 +396,7 @@ thead th {
   border-bottom: 1px solid #dbe3ed;
   background: #f8fafc;
   color: #475569;
-  text-align: left;
+  text-align: center;
   font-size: 12px;
   text-transform: uppercase;
 }
@@ -447,6 +448,18 @@ tbody tr.selected-row {
   font-size: inherit;
   font-weight: 800;
   text-transform: inherit;
+  justify-content: center;
+  width: 100%;
+}
+
+tbody td:nth-child(3),
+tbody td:nth-child(4),
+tbody td:nth-child(5),
+tbody td:nth-child(8),
+tbody td:nth-child(9),
+tbody td:nth-child(10) {
+  text-align: center;
+  vertical-align: middle;
 }
 
 .sort-button span {
@@ -457,6 +470,12 @@ tbody tr.selected-row {
   color: #334155;
   font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
   font-size: 13px;
+}
+
+.input-date {
+  white-space: nowrap;
+  color: #334155;
+  font-weight: 700;
 }
 
 .wok-pill {
@@ -802,6 +821,10 @@ tbody tr.selected-row {
   }
 
   .table-wrap .amount {
+    white-space: normal;
+  }
+
+  .table-wrap .input-date {
     white-space: normal;
   }
 

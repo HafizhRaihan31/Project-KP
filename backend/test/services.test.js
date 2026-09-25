@@ -29,6 +29,7 @@ test("menghitung total dan menghasilkan DOCX", async () => {
   assert.equal(data.totalOdp, "7");
   assert.equal(data.totalPort, "56");
   assert.equal(data.totalBoq, "48.137.267");
+  assert.equal(Object.hasOwn(data.items[0], "tanggalInput"), false);
   assert.deepEqual(data.evidenceRows, [{
     leftCaption: "PT3BR-25-WLR-FA-KENDAL_22024_H2_2025 (Warga tidak mengizinkan penambahan tiang)",
     rightCaption: "PT3BR-25-SMC-FC-SMG2_SMC_SEKARANGNPATI (Hasil review DBAD = DROP, OVER CPP)",

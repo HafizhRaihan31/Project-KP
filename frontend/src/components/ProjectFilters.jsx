@@ -1,5 +1,6 @@
 export default function ProjectFilters(props) {
-  const { search, wokFilter, wokOptions, loading, onSearchChange, onWokChange, onReset } = props;
+  const { search, wokFilter, dateFilter, wokOptions, loading,
+    onSearchChange, onWokChange, onDateChange, onReset } = props;
   return <section className="toolbar" aria-label="Filter dan pencarian">
     <div className="search-box">
       <label htmlFor="project-search">Cari data</label>
@@ -12,6 +13,11 @@ export default function ProjectFilters(props) {
         <option value="all">Semua WOK</option>
         {wokOptions.map((wok) => <option key={wok} value={wok}>{wok}</option>)}
       </select>
+    </div>
+    <div className="date-box">
+      <label htmlFor="date-filter">Tanggal input</label>
+      <input id="date-filter" type="date" value={dateFilter}
+        onInput={(event) => onDateChange(event.currentTarget.value)} />
     </div>
     <div className="toolbar-actions">
       <button className="button muted" onClick={onReset} disabled={loading}>Reset</button>

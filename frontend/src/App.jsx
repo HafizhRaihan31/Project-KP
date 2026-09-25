@@ -8,13 +8,14 @@ import ProjectTable from "./components/ProjectTable.jsx";
 import ReportDetailsForm from "./components/ReportDetailsForm.jsx";
 import StatsGrid from "./components/StatsGrid.jsx";
 import StatusAlerts from "./components/StatusAlerts.jsx";
-import { parseAmount, sortProjects } from "./utils/projects.js";
+import { parseAmount, parseInputDate, sortProjects } from "./utils/projects.js";
 
 export default function App() {
   const [authState, setAuthState] = useState("checking");
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [wokFilter, setWokFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
   const [sortKey, setSortKey] = useState("no");
   const [sortDir, setSortDir] = useState("asc");
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -38,10 +39,13 @@ export default function App() {
       const matchesSearch = !query || Object.values(project).some(
         (value) => String(value || "").toLowerCase().includes(query),
       );
-      return matchesSearch && (wokFilter === "all" || project.wok === wokFilter);
+      const matchesDate = !dateFilter
+        || parseInputDate(project.tanggalInput) === parseInputDate(dateFilter);
+      return matchesSearch && matchesDate
+        && (wokFilter === "all" || project.wok === wokFilter);
     });
     return sortProjects(filtered, sortKey, sortDir);
-  }, [projects, search, wokFilter, sortKey, sortDir]);
+  }, [projects, search, wokFilter, dateFilter, sortKey, sortDir]);
 
   const wokOptions = useMemo(
     () => [...new Set(projects.map((project) => project.wok).filter(Boolean))]
@@ -183,6 +187,7 @@ export default function App() {
   function resetFilters() {
     setSearch("");
     setWokFilter("all");
+    setDateFilter("");
     setSortKey("no");
     setSortDir("asc");
     loadProjects();
@@ -203,13 +208,14 @@ export default function App() {
     <PageHeader loading={loading} onRefresh={handleRefresh} onLogout={handleLogout} />
     <StatsGrid totalData={projects.length} visibleData={visibleProjects.length}
       selectedData={selectedIds.size} totalBoq={totalBoq} />
-    <ProjectFilters search={search} wokFilter={wokFilter} wokOptions={wokOptions} loading={loading}
-      onSearchChange={setSearch} onWokChange={setWokFilter} onReset={resetFilters} />
+    <ProjectFilters search={search} wokFilter={wokFilter} dateFilter={dateFilter}
+      wokOptions={wokOptions} loading={loading} onSearchChange={setSearch}
+      onWokChange={setWokFilter} onDateChange={setDateFilter} onReset={resetFilters} />
     {(errorMsg || syncMsg) && <StatusAlerts errorMessage={errorMsg} successMessage={syncMsg} />}
     <ReportDetailsForm values={reportDetails} onChange={setReportDetails} />
     <ProjectTable projects={visibleProjects} selectedIds={selectedIds} sortKey={sortKey} sortDir={sortDir}
       allVisibleSelected={allVisibleSelected} onSort={handleSort} onToggle={toggleSelect}
-      onToggleAll={toggleSelectAllVisible} />
+      onToggleAll={toggleSelectAllVisible} dateFilter={dateFilter} />
     <ExportActionBar selectedCount={selectedIds.size} selectedBoq={selectedBoq} filename={exportFilename}
       filenamePlaceholder={defaultFilename()} generating={generating} onFilenameChange={setExportFilename}
       onClear={() => setSelectedIds(new Set())} onGenerate={handleGenerate} />
